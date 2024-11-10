@@ -34,6 +34,7 @@ pipeline {
                     echo "Test Stage"
                     test -f build/index.html
                     npm test
+                    ls -la
                 '''
             }
         }
@@ -42,7 +43,6 @@ pipeline {
     post {
         always {
             junit 'test-results/junit.xml'
-            
         }
     }
 }
