@@ -35,6 +35,7 @@ pipeline {
                     test -f build/index.html
                     npm test
                     ls -la
+                    cd test-results && ls -la
                 '''
             }
         }
