@@ -22,9 +22,7 @@ pipeline {
                     npm ci
                     npm i npx
                     npx --version
-                    npx playwright install 
                     npm run build
-                    ls -la
                 '''
             }
         }
@@ -42,8 +40,6 @@ pipeline {
                     echo "Test Stage"
                     test -f build/index.html
                     npm test
-                    ls -la
-                    cd test-results && ls -la
                 '''
             }
         }
@@ -58,6 +54,9 @@ pipeline {
             steps {
                 // Run Playwright tests
                 sh '''
+                sh 'rm -rf $PLAYWRIGHT_BROWSERS_PATH'
+                npx playwright install 
+                ls /var/jenkins_home/workspace/learn-jenkins-app/playwright-browsers/chromium-1084/chrome-linux/ 
                     npm run test:ci
                 '''
             }
@@ -66,7 +65,10 @@ pipeline {
 
     post {
         always {
-            junit 'test-results/junit.xml'
+            junit (
+                allowEmptyResults: true,
+                'test-results/junit.xml'
+            )
 
               // Archive Playwright reports, logs, or screenshots if you generate them
             archiveArtifacts artifacts: 'playwright-report/**/*', allowEmptyArchive: true
