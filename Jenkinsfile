@@ -44,9 +44,18 @@ pipeline {
         }
 
          stage('Run Playwright Tests') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
             steps {
                 // Run Playwright tests
-                sh 'npx playwright test'
+                sh '''
+                    npm run start
+                    npx playwright test
+                '''
             }
         }
     }
