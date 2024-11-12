@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+     environment {
+        PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = '1'
+        PLAYWRIGHT_BROWSERS_PATH = "$WORKSPACE/playwright-browsers" // Adjust this path if needed
+    }
+
     stages {
         stage('Build') {
             agent {
@@ -53,7 +58,7 @@ pipeline {
             steps {
                 // Run Playwright tests
                 sh '''
-                    npm run test:ci
+                    'npm run start & sleep 5 && npx playwright test'
                 '''
             }
         }
