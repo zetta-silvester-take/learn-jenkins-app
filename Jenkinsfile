@@ -65,7 +65,7 @@ pipeline {
 
     post {
         always {
-            junit 'junit.xml'
+            junit 'test-results/junit.xml'
             
 
               // Archive Playwright reports, logs, or screenshots if you generate them
