@@ -27,7 +27,7 @@ pipeline {
             }
         }
 
-        stage('Test'){
+        stage('Unit Test'){
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -44,20 +44,20 @@ pipeline {
             }
         }
 
-         stage('Run Playwright Tests') {
+         stage('End to End Test') {
             agent {
                 docker {
-                    image 'node:18-alpine'
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
                     reuseNode true
                 }
             }
             steps {
                 // Run Playwright tests
                 sh '''
-                sh 'rm -rf $PLAYWRIGHT_BROWSERS_PATH'
-                npx playwright install 
-                ls /var/jenkins_home/workspace/learn-jenkins-app/playwright-browsers/chromium-1084/chrome-linux/ 
-                    npm run test:ci
+                    npm install serve
+                    node_modules/.bin/serve -s build &
+                    sleep 10
+                    npx playwright test  --reporter=html
                 '''
             }
         }
@@ -72,11 +72,16 @@ pipeline {
             archiveArtifacts artifacts: 'playwright-report/**/*', allowEmptyArchive: true
 
             // Optionally, publish Playwright report in Jenkins if using plugins that support HTML reports
-            publishHTML(target: [
-                reportDir: 'playwright-report',
+               publishHTML([ 
+                allowMissing: false, 
+                alwaysLinkToLastBuild: false, 
+                keepAll: false, 
+                reportDir: 'playwright-report', 
                 reportFiles: 'index.html',
-                reportName: 'Playwright Test Report'
-            ])
+                reportName: 'Playwright HTML Report', 
+                reportTitles: '', 
+                useWrapperFileDirectly: true
+                ])
         }
 
         success {
