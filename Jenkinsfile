@@ -1,13 +1,8 @@
 pipeline {
     agent any
 
-     environment {
-        PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = '1'
-        PLAYWRIGHT_BROWSERS_PATH = "$WORKSPACE/playwright-browsers" // Adjust this path if needed
-    }
-
     stages {
-        stage('Build') {
+        stage('Instal Dependencies') {
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -42,9 +37,15 @@ pipeline {
                     npm test
                 '''
             }
+
+            post {
+                always {
+                     junit 'test-results/junit.xml'
+                }
+            }
         }
 
-         stage('End to End Test') {
+         stage('EndtoEnd Test') {
             agent {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
@@ -65,9 +66,6 @@ pipeline {
 
     post {
         always {
-            junit 'test-results/junit.xml'
-            
-
               // Archive Playwright reports, logs, or screenshots if you generate them
             archiveArtifacts artifacts: 'playwright-report/**/*', allowEmptyArchive: true
 
@@ -82,7 +80,7 @@ pipeline {
                 reportTitles: '', 
                 useWrapperFileDirectly: true
                 ])
-        }
+            }
 
         success {
             echo 'Playwright tests passed successfully!'
